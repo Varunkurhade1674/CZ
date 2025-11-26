@@ -1,13 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'; // Force rebuild
 import { Search, Filter, CalendarCheck } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Modal from './Modal';
 import AddDriverForm from './AddDriverForm';
 import EditDriverForm from './EditDriverForm';
 import AddVehicleForm from './AddVehicleForm';
-import DriverSelector from './driver/DriverSelector';
-import DocumentExtractor from './DocumentExtractor';
-import DocumentRecords from './DocumentRecords';
+
 import AttendanceCalendar from './AttendanceCalendar';
 
 const API_BASE_URL = import.meta.env?.VITE_API_BASE_URL || '';
@@ -41,9 +39,7 @@ const DriverManagement = ({ addToast }) => {
   const [showAddDriverModal, setShowAddDriverModal] = useState(false);
   const [showEditDriverModal, setShowEditDriverModal] = useState(false);
   const [selectedDriver, setSelectedDriver] = useState(null);
-  const [selectedDocDriver, setSelectedDocDriver] = useState(null);
-  const [recordsRefreshKey, setRecordsRefreshKey] = useState(0);
-  const [recordBeingEdited, setRecordBeingEdited] = useState(null);
+
   const [showAttendanceModal, setShowAttendanceModal] = useState(false);
 
   const handleAddDriver = (formData) => {
@@ -76,16 +72,7 @@ const DriverManagement = ({ addToast }) => {
             </div>
           </div>
 
-<<<<<<< HEAD
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.05 }}
-        className="space-y-6"
-      >
-        <DriverSelector selectedDriver={selectedDocDriver} onSelect={setSelectedDocDriver} />
-        <DocumentExtractor selectedDriver={selectedDocDriver} addToast={addToast} />
-      </motion.div>
+
           <div className="mt-6 pt-6 border-t border-gray-700/50">
             <div className="flex flex-col md:flex-row gap-4">
               <div className="relative flex-1">
@@ -133,25 +120,9 @@ const DriverManagement = ({ addToast }) => {
           </div>
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.05 }}
-          className="space-y-6"
-        >
-          <DriverSelector selectedDriver={selectedDocDriver} onSelect={setSelectedDocDriver} />
-          <DocumentExtractor
-            selectedDriver={selectedDocDriver}
-            addToast={addToast}
-            onUploadComplete={() => setRecordsRefreshKey(prev => prev + 1)}
-          />
-        </motion.div>
 
-        <DocumentRecords
-          addToast={addToast}
-          onEditRecord={handleRecordEditRequest}
-          refreshSignal={recordsRefreshKey}
-        />
+
+
 
         {
           showEditDriverModal && selectedDriver && (
@@ -177,68 +148,68 @@ const DriverManagement = ({ addToast }) => {
           )
         }
 
-<<<<<<< HEAD
-      {/* Message Modal */}
-      {showMessageModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <motion.div 
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="bg-white rounded-lg p-6 w-full max-w-md"
-          >
-            <h2 className="text-xl font-bold mb-4">Send Message to {selectedDriver.name}</h2>
-            <textarea
-              className="w-full p-3 border border-gray-300 rounded-lg mb-4 h-32 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Type your message here..."
-              value={messageContent}
-              onChange={(e) => setMessageContent(e.target.value)}
-            ></textarea>
-            <div className="flex justify-end space-x-3">
-              <button 
-                onClick={() => setShowMessageModal(false)}
-                className="btn-secondary"
-              >
-                Cancel
-              </button>
-              <button 
-                onClick={handleSendMessage}
-                className="btn-primary"
-              >
-                Send Message
-              </button>
-            </div>
-          </motion.div>
-        </div>
-      )}
-      
-      {/* Driver Details Modal */}
-      {showDriverDetails && selectedDriver && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-[9999]">
-          <motion.div 
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="rounded-2xl p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl bg-gradient-to-br from-blue-50 via-white to-indigo-50 border border-blue-100"
-          >
-            <h2 className="text-xl font-bold mb-6">Driver Details</h2>
 
-            <div className="flex flex-col md:flex-row mb-6 gap-4">
-              <div className="md:w-1/3">
-                <div className="h-40 md:h-48 w-full bg-white/80 border border-blue-100 rounded-xl flex items-center justify-center text-4xl text-blue-600 shadow-sm">
-                  {selectedDriver.name.charAt(0)}
-                </div>
+        {/* Message Modal */}
+        {showMessageModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="bg-white rounded-lg p-6 w-full max-w-md"
+            >
+              <h2 className="text-xl font-bold mb-4">Send Message to {selectedDriver.name}</h2>
+              <textarea
+                className="w-full p-3 border border-gray-300 rounded-lg mb-4 h-32 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Type your message here..."
+                value={messageContent}
+                onChange={(e) => setMessageContent(e.target.value)}
+              ></textarea>
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={() => setShowMessageModal(false)}
+                  className="btn-secondary"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSendMessage}
+                  className="btn-primary"
+                >
+                  Send Message
+                </button>
               </div>
-              <div className="md:w-2/3 bg-white/80 rounded-xl border border-blue-100 p-4 shadow-sm">
-                <h3 className="text-2xl font-bold mb-3 text-blue-700">{selectedDriver.name}</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-xs uppercase tracking-wide text-gray-500">Phone</p>
-                    <p className="font-medium text-gray-900">{selectedDriver.phone}</p>
+            </motion.div>
+          </div>
+        )}
+
+        {/* Driver Details Modal */}
+        {showDriverDetails && selectedDriver && (
+          <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-[9999]">
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="rounded-2xl p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl bg-gradient-to-br from-blue-50 via-white to-indigo-50 border border-blue-100"
+            >
+              <h2 className="text-xl font-bold mb-6">Driver Details</h2>
+
+              <div className="flex flex-col md:flex-row mb-6 gap-4">
+                <div className="md:w-1/3">
+                  <div className="h-40 md:h-48 w-full bg-white/80 border border-blue-100 rounded-xl flex items-center justify-center text-4xl text-blue-600 shadow-sm">
+                    {selectedDriver.name.charAt(0)}
                   </div>
-                  <div>
-                    <p className="text-xs uppercase tracking-wide text-gray-500">Join Date</p>
-                    <p className="font-medium text-gray-900">{selectedDriver.joinDate}</p>
-                  </div>
-                  {/* <div>
+                </div>
+                <div className="md:w-2/3 bg-white/80 rounded-xl border border-blue-100 p-4 shadow-sm">
+                  <h3 className="text-2xl font-bold mb-3 text-blue-700">{selectedDriver.name}</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-xs uppercase tracking-wide text-gray-500">Phone</p>
+                      <p className="font-medium text-gray-900">{selectedDriver.phone}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs uppercase tracking-wide text-gray-500">Join Date</p>
+                      <p className="font-medium text-gray-900">{selectedDriver.joinDate}</p>
+                    </div>
+                    {/* <div>
                     <p className="text-sm text-gray-500">Status</p>
                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                       selectedDriver.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
@@ -246,36 +217,36 @@ const DriverManagement = ({ addToast }) => {
                       {selectedDriver.status}
                     </span>
                   </div> */}
-                  <div>
-                    <p className="text-xs uppercase tracking-wide text-gray-500">Verification</p>
-                    {selectedDriver.verification === 'Verified' ? (
-                      <span className="flex items-center text-green-600 font-medium">
-                        <CheckCircle size={16} className="mr-1" />
-                        Verified
-                      </span>
-                    ) : selectedDriver.verification === 'Rejected' ? (
-                      <span className="flex items-center text-red-600 font-medium">
-                        <XCircle size={16} className="mr-1" />
-                        Rejected
-                      </span>
-                    ) : (
-                      <span className="flex items-center text-yellow-600 font-medium">
-                        <AlertTriangle size={16} className="mr-1" />
-                        Pending
-                      </span>
-                    )}
+                    <div>
+                      <p className="text-xs uppercase tracking-wide text-gray-500">Verification</p>
+                      {selectedDriver.verification === 'Verified' ? (
+                        <span className="flex items-center text-green-600 font-medium">
+                          <CheckCircle size={16} className="mr-1" />
+                          Verified
+                        </span>
+                      ) : selectedDriver.verification === 'Rejected' ? (
+                        <span className="flex items-center text-red-600 font-medium">
+                          <XCircle size={16} className="mr-1" />
+                          Rejected
+                        </span>
+                      ) : (
+                        <span className="flex items-center text-yellow-600 font-medium">
+                          <AlertTriangle size={16} className="mr-1" />
+                          Pending
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-              <div className="bg-white/90 border border-blue-100 p-4 rounded-xl shadow-sm">
-                <h4 className="font-semibold text-blue-700 mb-2">Vehicle Information</h4>
-                <p className="text-sm text-gray-600"><span className="font-medium text-gray-800">Vehicle Number:</span> {selectedDriver.vehicle}</p>
-                <p className="text-sm text-gray-600"><span className="font-medium text-gray-800">License Number:</span> {selectedDriver.licenseNo}</p>
-              </div>
-              {/* <div className="bg-gray-50 p-4 rounded-lg">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div className="bg-white/90 border border-blue-100 p-4 rounded-xl shadow-sm">
+                  <h4 className="font-semibold text-blue-700 mb-2">Vehicle Information</h4>
+                  <p className="text-sm text-gray-600"><span className="font-medium text-gray-800">Vehicle Number:</span> {selectedDriver.vehicle}</p>
+                  <p className="text-sm text-gray-600"><span className="font-medium text-gray-800">License Number:</span> {selectedDriver.licenseNo}</p>
+                </div>
+                {/* <div className="bg-gray-50 p-4 rounded-lg">
                 <h4 className="font-bold mb-2">Performance</h4>
                 <div className="flex items-center mb-2">
                   <span className="text-lg font-medium mr-2">{selectedDriver.rating}</span>
@@ -284,29 +255,29 @@ const DriverManagement = ({ addToast }) => {
                 </div>
                 <p><span className="text-gray-500">Total Trips:</span> {selectedDriver.trips}</p>
               </div> */}
-            </div>
-            
-            <div className="flex justify-end space-x-3">
-              <button
-                onClick={() => {
-                  setSelectedDriver(selectedDriver);
-                  setShowDriverDetails(false);
-                }}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition-colors"
-              >
-                <Edit size={16} />
-                Edit Driver
-              </button>
-              <button
-                onClick={() => setShowDriverDetails(false)}
-                className="btn-secondary"
-              >
-                Close
-              </button>
-            </div>
-          </motion.div>
-        </div>
-      )}
+              </div>
+
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={() => {
+                    setSelectedDriver(selectedDriver);
+                    setShowDriverDetails(false);
+                  }}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition-colors"
+                >
+                  <Edit size={16} />
+                  Edit Driver
+                </button>
+                <button
+                  onClick={() => setShowDriverDetails(false)}
+                  className="btn-secondary"
+                >
+                  Close
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
         {/* Add Driver Modal */}
         {
           showAddDriverModal && (
