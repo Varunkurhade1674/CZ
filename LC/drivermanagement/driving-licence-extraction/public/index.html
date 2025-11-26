@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DL Data Extractor</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>License Data Extractor</h2>
+        
+        <form id="uploadForm">
+            <label for="licenseImage">Upload Driving License Image (PNG/JPG):</label>
+            <input type="file" id="licenseImage" name="licenseImage" accept="image/png, image/jpeg" required>
+            <button type="submit">Extract & Save Data</button>
+        </form>
+
+        <p id="message" class="hidden"></p>
+
+        <hr>
+
+        <h3>Saved License Records</h3>
+        <button id="refreshData">Refresh/Show All Records</button>
+
+        <div class="table-container">
+            <div class="list-controls">
+                <input id="searchInput" class="search-input" placeholder="Search by name, license number, DOB, or expiry date..." />
+                <div class="controls-right">
+                    <button id="refreshData" class="button-secondary">Refresh</button>
+                </div>
+            </div>
+
+            <div class="table-wrap">
+                <table id="licenseTable">
+                    <thead>
+                        <tr>
+                            <th>Driver Details</th>
+                            <th>License No.</th>
+                            <th>DOB</th>
+                            <th>Expiry Date</th>
+                            <th>Status</th>
+                            <th>Verification</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
