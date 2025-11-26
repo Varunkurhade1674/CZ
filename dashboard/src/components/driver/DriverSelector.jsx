@@ -25,7 +25,13 @@ const DriverSelector = ({ selectedDriver, onSelect }) => {
       if (!response.ok) {
         throw new Error('Unable to fetch drivers');
       }
-      const payload = await response.json();
+      const bodyText = await response.text();
+      let payload = [];
+      try {
+        payload = JSON.parse(bodyText || '[]');
+      } catch {
+        throw new Error('Unexpected response from server. Please ensure the driver API is running.');
+      }
       const list = Array.isArray(payload) ? payload : [];
       setDrivers(list);
 
@@ -248,4 +254,7 @@ const DriverSelector = ({ selectedDriver, onSelect }) => {
 };
 
 export default DriverSelector;
+
+
+
 
