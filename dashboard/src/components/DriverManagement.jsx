@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Filter, CheckCircle, XCircle, AlertTriangle, Mail, Eye, Edit, Trash2, Sparkles, UserPlus } from 'lucide-react';
+import { Search, Filter, CalendarCheck } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Modal from './Modal';
 import AddDriverForm from './AddDriverForm';
@@ -7,6 +7,31 @@ import EditDriverForm from './EditDriverForm';
 import AddVehicleForm from './AddVehicleForm';
 import DriverSelector from './driver/DriverSelector';
 import DocumentExtractor from './DocumentExtractor';
+import DocumentRecords from './DocumentRecords';
+import AttendanceCalendar from './AttendanceCalendar';
+
+const API_BASE_URL = import.meta.env?.VITE_API_BASE_URL || '';
+const buildUrl = (path = '') => `${API_BASE_URL}${path}`;
+
+const toInputDate = (value = '') => {
+  if (!value) return '';
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(value)) {
+    const [dd, mm, yyyy] = value.split('/');
+    return `${yyyy}-${mm}-${dd}`;
+  }
+  return value;
+};
+
+const toDisplayDate = (value = '') => {
+  if (!value) return '';
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(value)) return value;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    const [yyyy, mm, dd] = value.split('-');
+    return `${dd}/${mm}/${yyyy}`;
+  }
+  return value;
+};
 
 const DriverManagement = ({ addToast }) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -17,135 +42,9 @@ const DriverManagement = ({ addToast }) => {
   const [showEditDriverModal, setShowEditDriverModal] = useState(false);
   const [selectedDriver, setSelectedDriver] = useState(null);
   const [selectedDocDriver, setSelectedDocDriver] = useState(null);
-  const [messageContent, setMessageContent] = useState('');
-  const [clickedDriver, setClickedDriver] = useState(null);
-  const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
-  
-  const handleShowDriverDetails = (driver) => {
-    setSelectedDriver(driver);
-    setShowDriverDetails(true);
-  };
-
-  const drivers = [
-    {
-      id: 1,
-      name: 'Rajesh Kumar',
-      vehicle: 'MH-01-AB-1234',
-      licenseNo: 'DL-0120210012345',
-      status: 'Active',
-      verification: 'Verified',
-      dob: '1988-05-12',
-      doi: '2010-03-10',
-      phone: '+91 98765 43210',
-      joinDate: '2023-01-15',
-      trips: 1250,
-      rating: 4.8,
-      licenseExpiry: '2026-03-15'
-    },
-    {
-      id: 2,
-      name: 'Salim Shaikh',
-      vehicle: 'MH-02-CD-5678',
-      licenseNo: 'DL-0120210054321',
-      status: 'Active',
-      verification: 'Pending',
-      dob: '1991-08-24',
-      doi: '2012-05-01',
-      phone: '+91 91234 56789',
-      joinDate: '2022-05-20',
-      trips: 980,
-      rating: 4.5,
-      licenseExpiry: '2025-09-30'
-    },
-    {
-      id: 3,
-      name: 'Vikram Patil',
-      vehicle: 'MH-03-EF-9012',
-      licenseNo: 'DL-0120210098765',
-      status: 'Inactive',
-      verification: 'Rejected',
-      dob: '1985-11-05',
-      doi: '2008-07-12',
-      phone: '+91 99887 66554',
-      joinDate: '2021-09-12',
-      trips: 450,
-      rating: 4.2,
-      licenseExpiry: '2025-11-10'
-    },
-    {
-      id: 4,
-      name: 'Pranav Hugar',
-      vehicle: 'KA71 20220002422',
-      licenseNo: 'KA71-20220002422',
-      status: 'Pending',
-      verification: 'Pending',
-      dob: '2004-01-25',
-      doi: '2021-01-24',
-      phone: '+91 90123 45678',
-      joinDate: '2024-07-18',
-      trips: 600,
-      rating: 4.1,
-      licenseExpiry: '2044-01-24'
-    },
-    {
-      id: 5,
-      name: 'Saurabh Kumar Singh',
-      vehicle: 'KA22 20230006797',
-      licenseNo: 'KA22-20230006797',
-      status: 'Pending',
-      verification: 'Pending',
-      dob: '2004-06-24',
-      doi: '2021-06-23',
-      phone: '+91 93456 78901',
-      joinDate: '2024-02-02',
-      trips: 720,
-      rating: 4.3,
-      licenseExpiry: '2044-06-23'
-    }
-  ];
-
-  const now = new Date();
-  const upcomingThreshold = new Date();
-  upcomingThreshold.setDate(now.getDate() + 30);
-
-  const filteredDrivers = drivers.filter(driver => {
-    const normalizedSearch = searchTerm.trim().toLowerCase();
-    const matchesSearch =
-      normalizedSearch.length === 0 ||
-      [driver.name, driver.vehicle, driver.licenseNo, driver.phone]
-        .filter(Boolean)
-        .some((field) => field.toLowerCase().includes(normalizedSearch));
-
-    if (filterOption === 'all') return matchesSearch;
-
-    if (filterOption.startsWith('verification:')) {
-      const verificationStatus = filterOption.split(':')[1];
-      return matchesSearch && driver.verification.toLowerCase() === verificationStatus;
-    }
-
-    if (filterOption === 'expiry:expired') {
-      return matchesSearch && new Date(driver.licenseExpiry) < now;
-    }
-
-    if (filterOption === 'expiry:upcoming') {
-      const expiryDate = new Date(driver.licenseExpiry);
-      return matchesSearch && expiryDate >= now && expiryDate <= upcomingThreshold;
-    }
-
-    return matchesSearch;
-  });
-
-  const handleSendMessage = () => {
-    if (messageContent.trim() === '') {
-      addToast('Please enter a message', 'error');
-      return;
-    }
-    
-    addToast(`Message sent to ${selectedDriver.name}`, 'success');
-    setMessageContent('');
-    setShowMessageModal(false);
-  };
-
+  const [recordsRefreshKey, setRecordsRefreshKey] = useState(0);
+  const [recordBeingEdited, setRecordBeingEdited] = useState(null);
+  const [showAttendanceModal, setShowAttendanceModal] = useState(false);
 
   const handleAddDriver = (formData) => {
     console.log('Adding driver:', formData);
@@ -156,74 +55,28 @@ const DriverManagement = ({ addToast }) => {
   return (
     <div className="flex flex-col min-h-[calc(100vh-8rem)] justify-start pt-8 pb-12">
       <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-      <motion.div 
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="glass-card p-6"
-      >
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold gradient-text mb-2">Driver Management</h1>
-            <p className="text-gray-400">Manage and monitor your fleet drivers and their details</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setShowAddDriverModal(true)}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
-            >
-              <UserPlus className="h-5 w-5 mr-2" />
-              Add New Driver
-            </button>
-          </div>
-        </div>
-      
-        <div className="mt-6 pt-6 border-t border-gray-700/50">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-              <input
-                type="text"
-                placeholder="Search by name or vehicle number..."
-                className="glass-input w-full pl-10"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="glass-card p-6"
+        >
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-bold gradient-text mb-2">Driver Management</h1>
+              <p className="text-gray-400">Manage and monitor your fleet drivers and their details</p>
             </div>
-            <div className="relative">
-              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-              <select
-                className="glass-input pl-10 pr-8 text-white bg-slate-900/70 border border-white/20"
-                value={filterOption}
-                onChange={(e) => setFilterOption(e.target.value)}
-              >
-                <option value="all">All Drivers</option>
-                <optgroup label="Verification">
-                  <option value="verification:verified">Verified</option>
-                  <option value="verification:pending">Pending</option>
-                  <option value="verification:rejected">Rejected</option>
-                </optgroup>
-                <optgroup label="Expiry">
-                  <option value="expiry:expired">Expired</option>
-                  <option value="expiry:upcoming">Expiring Soon (30 days)</option>
-                </optgroup>
-              </select>
-            </div>
-          </div>
-          {searchTerm.trim() && (
-            <div className="mt-3 text-sm text-blue-600">
-              Showing results for <span className="font-semibold">"{searchTerm}"</span>
+            <div className="flex items-center gap-3">
               <button
-                type="button"
-                className="ml-3 text-xs text-blue-500 hover:text-blue-700"
-                onClick={() => setSearchTerm('')}
+                onClick={() => setShowAttendanceModal(true)}
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors"
               >
-                Clear
+                <CalendarCheck className="h-5 w-5 mr-2" />
+                Attendance
               </button>
             </div>
-          )}
-        </div>
-      </motion.div>
+          </div>
 
+<<<<<<< HEAD
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -391,29 +244,100 @@ const DriverManagement = ({ addToast }) => {
                 }}
                 onCancel={() => setShowEditDriverModal(false)}
               />
+=======
+          <div className="mt-6 pt-6 border-t border-gray-700/50">
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                <input
+                  type="text"
+                  placeholder="Search by name or vehicle number..."
+                  className="glass-input w-full pl-10"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              <div className="relative">
+                <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                <select
+                  className="glass-input pl-10 pr-8 text-white bg-slate-900/70 border border-white/20"
+                  value={filterOption}
+                  onChange={(e) => setFilterOption(e.target.value)}
+                >
+                  <option value="all">All Drivers</option>
+                  <optgroup label="Verification">
+                    <option value="verification:verified">Verified</option>
+                    <option value="verification:pending">Pending</option>
+                    <option value="verification:rejected">Rejected</option>
+                  </optgroup>
+                  <optgroup label="Expiry">
+                    <option value="expiry:expired">Expired</option>
+                    <option value="expiry:upcoming">Expiring Soon (30 days)</option>
+                  </optgroup>
+                </select>
+              </div>
+>>>>>>> 7581f446dc968339646fa0d1778e14cf4f3675d4
             </div>
-          </motion.div>
-        </div>
-      )}
+            {searchTerm.trim() && (
+              <div className="mt-3 text-sm text-blue-600">
+                Showing results for <span className="font-semibold">"{searchTerm}"</span>
+                <button
+                  type="button"
+                  className="ml-3 text-xs text-blue-500 hover:text-blue-700"
+                  onClick={() => setSearchTerm('')}
+                >
+                  Clear
+                </button>
+              </div>
+            )}
+          </div>
+        </motion.div>
 
-      {/* Add Driver Modal */}
-      {showAddDriverModal && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] px-4">
-          <motion.div 
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="w-full max-w-2xl max-h-[85vh] rounded-2xl p-4 sm:p-6 shadow-2xl bg-transparent flex flex-col"
-          >
-            <div className="overflow-y-auto pr-1 flex-1">
-              <AddDriverForm
-                onSubmit={handleAddDriver}
-                onCancel={() => setShowAddDriverModal(false)}
-              />
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05 }}
+          className="space-y-6"
+        >
+          <DriverSelector selectedDriver={selectedDocDriver} onSelect={setSelectedDocDriver} />
+          <DocumentExtractor
+            selectedDriver={selectedDocDriver}
+            addToast={addToast}
+            onUploadComplete={() => setRecordsRefreshKey(prev => prev + 1)}
+          />
+        </motion.div>
+
+        <DocumentRecords
+          addToast={addToast}
+          onEditRecord={handleRecordEditRequest}
+          refreshSignal={recordsRefreshKey}
+        />
+
+        {
+          showEditDriverModal && selectedDriver && (
+            <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] px-4">
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className="w-full max-w-xl max-h-[80vh] rounded-xl p-6 shadow-xl bg-white border border-slate-200 flex flex-col"
+              >
+                <h2 className="text-2xl font-semibold text-slate-900 mb-4">Edit Driver</h2>
+                <p className="text-sm text-slate-500 mb-4">
+                  Update the driver details below. Fields are pre-filled from the extracted licence data.
+                </p>
+                <div className="overflow-y-auto pr-1 flex-1">
+                  <EditDriverForm
+                    driver={selectedDriver}
+                    onSubmit={handleDriverUpdate}
+                    onCancel={handleCancelEdit}
+                  />
+                </div>
+              </motion.div>
             </div>
-          </motion.div>
-        </div>
-      )}
+          )
+        }
 
+<<<<<<< HEAD
       {/* Message Modal */}
       {showMessageModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -543,6 +467,33 @@ const DriverManagement = ({ addToast }) => {
           </motion.div>
         </div>
       )}
+        {/* Add Driver Modal */}
+        {
+          showAddDriverModal && (
+            <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] px-4">
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className="w-full max-w-2xl max-h-[85vh] rounded-2xl p-4 sm:p-6 shadow-2xl bg-transparent flex flex-col"
+              >
+                <div className="overflow-y-auto pr-1 flex-1">
+                  <AddDriverForm
+                    onSubmit={handleAddDriver}
+                    onCancel={() => setShowAddDriverModal(false)}
+                  />
+                </div>
+              </motion.div>
+            </div>
+          )
+        }
+
+        {/* Attendance Calendar Modal */}
+        <AttendanceCalendar
+          isOpen={showAttendanceModal}
+          onClose={() => setShowAttendanceModal(false)}
+          addToast={addToast}
+        />
+
       </div>
     </div>
   );

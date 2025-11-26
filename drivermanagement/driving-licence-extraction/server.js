@@ -7,7 +7,7 @@ const path = require('path');
 // --- 🛠️ CORRECTED DOTENV CONFIGURATION ---
 // This line both imports the module and immediately runs the config method,
 // pointing it to your 'key.env' file.
-require('dotenv').config({path: path.join(__dirname, 'key.env')});
+require('dotenv').config({ path: path.join(__dirname, 'key.env') });
 // ------------------------------------------
 console.log('Firebase Project ID:', process.env.FIREBASE_PROJECT_ID); // Debugging line
 
@@ -16,6 +16,7 @@ const licenseRoutes = require('./routes/LicenseRoutes');
 const vehicleRoutes = require('./routes/VehicleRoutes');
 const aadharRoutes = require('./routes/AadharRoutes');
 const driverRoutes = require('./routes/DriverRoutes');
+const attendanceRoutes = require('./routes/AttendanceRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -63,6 +64,7 @@ app.get('/uploads/:filename', (req, res, next) => {
 app.use('/api', licenseRoutes);
 app.use('/api', vehicleRoutes);
 app.use('/api', driverRoutes);
+app.use('/api', attendanceRoutes);
 app.use('/api/aadhar', aadharRoutes);
 
 // Start the server

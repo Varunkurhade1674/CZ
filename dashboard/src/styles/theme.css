@@ -15,9 +15,10 @@ body {
   --text-heading: #0F172A;     /* Deep navy/black */
   --text-subheading: #475569;  /* Dark slate */
   --text-body: #64748B;        /* Medium slate */
-  --bg-primary: #f8fafc;
-  --bg-secondary: #e2e8f0;
-  --challenges-bg: #f1f5f9;
+  /* Global light-mode background now uses CZ light blue */
+  --bg-primary: #C6FCFF;       /* CZ light blue */
+  --bg-secondary: #a5f5ff;     /* slightly deeper CZ light blue */
+  --challenges-bg: #e0f2fe;
 }
 
 /* Default = Light Mode */

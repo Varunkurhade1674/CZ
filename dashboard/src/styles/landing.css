@@ -791,10 +791,10 @@ section {
 }
 
 :root {
-    /* New Color Palette - Based on User's Image */
-    --bg-primary: #1F3A52;         /* Dark Blue - Primary background */
-    --bg-secondary: #2E5266;       /* Medium Blue - Secondary background */
-    --bg-tertiary: #5F7A8A;        /* Slate Blue - Tertiary background */
+    /* Global background palette - keep in sync with light mode theme (CZ light blue) */
+    --bg-primary: #C6FCFF;         /* CZ light blue - Primary background */
+    --bg-secondary: #a5f5ff;       /* Slightly deeper CZ light blue - Secondary background */
+    --bg-tertiary: #e0f2fe;        /* Soft sky blue - Tertiary background */
     --accent-beige: #C4B5A0;       /* Beige/Tan - Accent color */
     --text-primary: #FFFFFF;       /* White text */
     --text-secondary: #C4B5A0;     /* Beige for secondary text */
@@ -830,7 +830,7 @@ section {
 
 body {
     color: var(--text-color);
-    background-color: var(--background-color);
+    /* Let the global theme (`theme.css`) control the page background */
     line-height: 1.6;
 }
 
