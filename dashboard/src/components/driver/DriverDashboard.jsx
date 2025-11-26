@@ -3,11 +3,13 @@ import { Home, FileText, CheckCircle, Bell, MessageSquare, Settings, Upload, Dow
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../App';
 import { useNavigate } from 'react-router-dom';
+import DriverSelector from './DriverSelector';
 
 const DriverDashboard = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('home');
+  const [selectedDriver, setSelectedDriver] = useState(null);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [driverData, setDriverData] = useState({
     name: user?.name || 'Rajesh Kumar',
@@ -25,6 +27,17 @@ const DriverDashboard = () => {
   const handleLogout = () => {
     logout();
     navigate('/login');
+  };
+
+  useEffect(() => {
+    setDriverData((prev) => ({
+      ...prev,
+      name: selectedDriver?.name || user?.name || prev.name,
+    }));
+  }, [selectedDriver, user]);
+
+  const handleDriverSelect = (driver) => {
+    setSelectedDriver(driver);
   };
 
   const [documents, setDocuments] = useState([
@@ -108,6 +121,9 @@ const DriverDashboard = () => {
 
   const renderHome = () => (
     <div className="space-y-6">
+      <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
+        <DriverSelector selectedDriver={selectedDriver} onSelect={handleDriverSelect} />
+      </motion.div>
       {/* Hero Welcome Card */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -124,6 +140,11 @@ const DriverDashboard = () => {
                 <div>
                   <h1 className="text-4xl font-bold gradient-text">Welcome Back!</h1>
                   <p className="text-xl text-emerald-400 font-semibold">{driverData.name}</p>
+                  <p className={`text-sm mt-1 ${selectedDriver ? 'text-emerald-300' : 'text-gray-400'}`}>
+                    {selectedDriver
+                      ? `Managing documents for ${selectedDriver.name || selectedDriver.id}`
+                      : 'Select a driver to start managing their documents'}
+                  </p>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4 mt-6">

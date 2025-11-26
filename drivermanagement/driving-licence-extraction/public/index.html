@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DL & RC Data Extractor</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="header-bar">
+        <div class="brand">DL & RC Extractor</div>
+        <button id="themeToggle" class="button-secondary">Toggle Theme</button>
+    </header>
+    <div class="hero">
+        <div class="hero-content">
+            <h1>Document Extraction</h1>
+            <p>Upload and manage Driving License, Vehicle RC, and Aadhaar records with a clean workflow.</p>
+        </div>
+    </div>
+    <div class="container">
+        <h2>Driving License & Vehicle RC Data Extractor</h2>
+
+        <!-- Driver Selection -->
+        <div class="driver-select">
+            <h3>Select Driver</h3>
+            <div class="driver-controls">
+                <label for="driverDropdown" class="field-label">Existing Drivers</label>
+                <select id="driverDropdown">
+                    <option value="">-- Select driver --</option>
+                </select>
+                <button id="refreshDrivers" class="button-secondary">Refresh</button>
+            </div>
+            <div class="driver-create">
+                <div class="form-field">
+                    <label class="field-label" for="driverNameInput">New Driver Name</label>
+                    <input id="driverNameInput" placeholder="Driver name" />
+                </div>
+                <div class="form-field">
+                    <label class="field-label" for="driverPhoneInput">Driver Phone (driverId)</label>
+                    <input id="driverPhoneInput" placeholder="10-digit phone" pattern="[0-9]{10}" />
+                </div>
+                <button id="addDriverBtn">Save & Select</button>
+            </div>
+            <p id="driverMessage" class="hidden"></p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs tabs-pills">
+            <button class="tab-button active" data-tab="license">Driving License</button>
+            <button class="tab-button" data-tab="vehicle">Vehicle RC</button>
+            <button class="tab-button" data-tab="aadhar">Aadhaar Card</button>
+        </div>
+
+        <!-- License Tab -->
+        <div id="license-tab" class="tab-content active">
+            <form id="uploadForm" class="form-card">
+                <div class="form-row">
+                    <div class="file-drop" id="licenseDrop">
+                        <input type="file" id="licenseImage" name="licenseImage" accept="image/png, image/jpeg" required>
+                        <div class="file-drop-hint">Drop image here or click to browse</div>
+                        <div class="file-name" id="licenseFileName"></div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit">Extract & Save Data</button>
+                        <div class="help-text">PNG/JPG up to 10MB</div>
+                    </div>
+                </div>
+            </form>
+
+            <p id="message" class="hidden"></p>
+
+            <hr>
+
+            <div class="section-header"><div class="section-title"><span class="icon">🔎</span>Saved License Records</div></div>
+            <button id="refreshLicenseData">Refresh/Show All Records</button>
+
+            <div class="table-container">
+                <div class="list-controls">
+                    <input id="searchLicenseInput" class="search-input" placeholder="Search by name, license number, DOB, or expiry date..." />
+                    <div class="controls-right">
+                        <button class="button-secondary">Refresh</button>
+                    </div>
+                </div>
+
+                <div class="table-wrap">
+                    <table id="licenseTable" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Driver Details</th>
+                                <th>License No.</th>
+                                <th>DOB</th>
+                                <th>Expiry Date</th>
+                                <th>Status</th>
+                                <th>Verification</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vehicle Tab -->
+        <div id="vehicle-tab" class="tab-content">
+            <form id="vehicleUploadForm" class="form-card">
+                <div class="form-row">
+                    <div class="file-drop" id="vehicleDrop">
+                        <input type="file" id="vehicleImage" name="vehicleImage" accept="image/png, image/jpeg, application/pdf" required>
+                        <div class="file-drop-hint">Drop image/PDF here or click to browse</div>
+                        <div class="file-name" id="vehicleFileName"></div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit">Extract & Save Data</button>
+                        <div class="help-text">PNG/JPG/PDF up to 10MB</div>
+                    </div>
+                </div>
+            </form>
+
+            <p id="vehicleMessage" class="hidden"></p>
+
+            <hr>
+
+            <div class="section-header"><div class="section-title"><span class="icon">🚘</span>Saved Vehicle Records</div></div>
+            <button id="refreshVehicleData">Refresh/Show All Records</button>
+
+            <div class="table-container">
+                <div class="list-controls">
+                    <input id="searchVehicleInput" class="search-input" placeholder="Search by owner name, registration no, make, or expiry date..." />
+                    <div class="controls-right">
+                        <button class="button-secondary">Refresh</button>
+                    </div>
+                </div>
+
+                <div class="table-wrap">
+                    <table id="vehicleTable" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Owner Details</th>
+                                <th>Registration No.</th>
+                                <th>Model</th>
+                                <th>Fuel Type</th>
+                                <th>RC Valid Upto</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Aadhaar Tab -->
+        <div id="aadhar-tab" class="tab-content">
+            <form id="aadharUploadForm" class="form-card">
+                <div class="form-row">
+                    <div class="file-drop" id="aadharDrop">
+                        <input type="file" id="aadharImage" name="aadharImage" accept="image/png, image/jpeg, application/pdf" required>
+                        <div class="file-drop-hint">Drop image/PDF here or click to browse</div>
+                        <div class="file-name" id="aadharFileName"></div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit">Extract & Save Data</button>
+                        <div class="help-text">PNG/JPG/PDF up to 10MB</div>
+                    </div>
+                </div>
+            </form>
+
+            <p id="aadharMessage" class="hidden"></p>
+
+            <hr>
+
+            <div class="section-header"><div class="section-title"><span class="icon">🪪</span>Saved Aadhaar Records</div></div>
+            <button id="refreshAadharData">Refresh/Show All Records</button>
+
+            <div class="table-container">
+                <div class="list-controls">
+                    <input id="searchAadharInput" class="search-input" placeholder="Search by name, Aadhaar number, DOB, or address..." />
+                    <div class="controls-right">
+                        <button class="button-secondary">Refresh</button>
+                    </div>
+                </div>
+
+                <div class="table-wrap">
+                    <table id="aadharTable" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Aadhaar No.</th>
+                                <th>DOB</th>
+                                <th>Gender</th>
+                                <th>Address</th>
+                                <th>PIN Code</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <footer class="footer">
+        <div class="footer-inner">© 2025 DL & RC Extractor</div>
+    </footer>
+    <script src="app.js"></script>
+</body>
+</html>

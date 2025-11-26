@@ -5,6 +5,7 @@ import Modal from './Modal';
 import AddDriverForm from './AddDriverForm';
 import EditDriverForm from './EditDriverForm';
 import AddVehicleForm from './AddVehicleForm';
+import DriverSelector from './driver/DriverSelector';
 
 const DriverManagement = ({ addToast }) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -14,6 +15,7 @@ const DriverManagement = ({ addToast }) => {
   const [showAddDriverModal, setShowAddDriverModal] = useState(false);
   const [showEditDriverModal, setShowEditDriverModal] = useState(false);
   const [selectedDriver, setSelectedDriver] = useState(null);
+  const [selectedDocDriver, setSelectedDocDriver] = useState(null);
   const [messageContent, setMessageContent] = useState('');
   const [clickedDriver, setClickedDriver] = useState(null);
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
@@ -219,6 +221,14 @@ const DriverManagement = ({ addToast }) => {
             </div>
           )}
         </div>
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.05 }}
+      >
+        <DriverSelector selectedDriver={selectedDocDriver} onSelect={setSelectedDocDriver} />
       </motion.div>
       
       <div className="glass-card p-0 overflow-hidden border border-white/10 backdrop-blur-sm">
