@@ -52,7 +52,7 @@ export const useAuth = () => {
 // Protected Route Component
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
-  
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -96,7 +96,7 @@ function OwnerDashboard() {
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     // { id: 'tracking', label: 'Live Tracking', icon: MapPin },
     { id: 'drivers', label: 'Drivers', icon: Users },
-    // { id: 'vehicles', label: 'Vehicles', icon: Car },
+    { id: 'vehicles', label: 'Vehicles', icon: Car },
     // { id: 'leaderboard', label: 'Leaderboard', icon: Trophy },
     { id: 'documents', label: 'Document Vault', icon: FolderLock },
     // { id: 'analytics', label: 'Analytics', icon: BarChart3 },
@@ -113,8 +113,8 @@ function OwnerDashboard() {
       //   return <LiveTracking />;
       case 'drivers':
         return <DriverManagement />;
-      // case 'vehicles':
-      //   return <VehicleManagement />;
+      case 'vehicles':
+        return <VehicleManagement />;
       // case 'leaderboard':
       //   return <Leaderboard />;
       case 'documents':
@@ -146,16 +146,16 @@ function OwnerDashboard() {
         <div className="glass-card p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <button 
+              <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}
                 className="p-2 rounded-lg bg-slate-700/50 hover:bg-slate-600/50 transition-colors lg:hidden"
               >
                 {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
               </button>
               <div className="flex items-center space-x-3">
-                <img 
-                  src="/images/logo.png" 
-                  alt="CabZone Logo" 
+                <img
+                  src="/images/logo.png"
+                  alt="CabZone Logo"
                   className="h-10 w-auto filter brightness-0 invert drop-shadow-lg"
                 />
                 <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">
@@ -169,21 +169,21 @@ function OwnerDashboard() {
 
             {/* Right Actions */}
             <div className="flex items-center space-x-2">
-              <button 
+              <button
                 onClick={() => setShowAI(true)}
                 className="p-2 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:opacity-90 transition-all hover:shadow-lg hover:shadow-blue-500/20"
                 title="AI Assistant"
               >
                 <Sparkles size={18} />
               </button>
-              <button 
+              <button
                 onClick={toggleTheme}
                 className="p-2 rounded-lg bg-slate-700/50 hover:bg-slate-600/50 transition-colors border border-slate-600/50"
                 title="Toggle theme"
               >
                 {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
               </button>
-              <button 
+              <button
                 className="p-2 rounded-lg bg-slate-700/50 hover:bg-slate-600/50 relative transition-all border border-slate-600/50"
                 onClick={() => setNotificationCount(0)}
               >
@@ -196,7 +196,7 @@ function OwnerDashboard() {
               </button>
 
               <div className="relative">
-                <button 
+                <button
                   onClick={() => setShowProfileMenu(!showProfileMenu)}
                   className="flex items-center space-x-2 focus:outline-none group"
                 >
@@ -246,15 +246,14 @@ function OwnerDashboard() {
                     onClick={() => {
                       setActiveTab(item.id);
                     }}
-                    className={`w-full flex items-center px-4 py-2.5 text-sm font-medium rounded-lg transition-all ${
-                      activeTab === item.id
-                        ? 'bg-gradient-to-r from-blue-600/80 to-indigo-600/80 text-white shadow-md shadow-blue-500/20'
-                        : 'text-slate-300 hover:bg-slate-700/50 hover:text-white'
-                    }`}
+                    className={`w-full flex items-center px-4 py-2.5 text-sm font-medium rounded-lg transition-all ${activeTab === item.id
+                      ? 'bg-gradient-to-r from-blue-600/80 to-indigo-600/80 text-white shadow-md shadow-blue-500/20'
+                      : 'text-slate-300 hover:bg-slate-700/50 hover:text-white'
+                      }`}
                   >
-                    <Icon 
-                      className={`mr-3 ${activeTab === item.id ? 'text-white' : 'text-slate-400'}`} 
-                      size={18} 
+                    <Icon
+                      className={`mr-3 ${activeTab === item.id ? 'text-white' : 'text-slate-400'}`}
+                      size={18}
                     />
                     <span>{item.label}</span>
                     {item.id === 'drivers' && (
@@ -302,10 +301,10 @@ function App() {
       <Routes>
         {/* Landing Page - NEW! */}
         <Route path="/" element={<LandingPage />} />
-        
+
         {/* Login Page */}
         <Route path="/login" element={<Login />} />
-        
+
         {/* Owner Dashboard */}
         <Route
           path="/owner/*"
@@ -315,7 +314,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
+
         {/* Driver Dashboard */}
         {/**
          * Driver Dashboard (commented out as requested)
@@ -329,7 +328,7 @@ function App() {
          *   }
          * />
          */}
-        
+
         {/* Unauthorized */}
         <Route
           path="/unauthorized"
