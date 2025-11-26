@@ -51,7 +51,7 @@ const DocumentExtractor = ({ selectedDriver, addToast, onUploadComplete }) => {
     } else {
       setStatus({
         type: 'success',
-        text: `Uploading documents for ${selectedDriver.name || getDriverId(selectedDriver)}`,
+        text: `Uploading documents for ${selectedDriver.name} (${selectedDriver.phone || selectedDriver.id || 'No Phone'})`,
       });
     }
   }, [selectedDriver]);
@@ -160,11 +160,10 @@ const DocumentExtractor = ({ selectedDriver, addToast, onUploadComplete }) => {
             key={key}
             type="button"
             onClick={() => setActiveTab(key)}
-            className={`rounded-full px-5 py-2 text-sm font-semibold transition ${
-              activeTab === key
+            className={`rounded-full px-5 py-2 text-sm font-semibold transition ${activeTab === key
                 ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg shadow-indigo-500/30'
                 : 'bg-white/5 text-gray-300 border border-white/10 hover:border-indigo-300/50'
-            }`}
+              }`}
           >
             {tab.label}
           </button>

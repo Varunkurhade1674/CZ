@@ -127,6 +127,9 @@ const DriverSelector = ({ selectedDriver, onSelect }) => {
         return [...withoutDuplicate, payload].sort((a, b) => a.name.localeCompare(b.name));
       });
 
+      // Refresh list from server to ensure data consistency
+      loadDrivers();
+
       onSelect(payload);
       setFormValues({ name: '', phone: '' });
       setStatus({
