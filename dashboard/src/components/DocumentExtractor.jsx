@@ -126,12 +126,18 @@ const DocumentExtractor = ({ selectedDriver, addToast, onUploadComplete }) => {
         onUploadComplete(activeTab, payload);
       }
     } catch (error) {
+      const rawMessage = error?.message || '';
+      const friendlyMessage =
+        rawMessage.includes('Unexpected token') || rawMessage.toLowerCase().includes('json')
+          ? 'Server returned an unexpected response. Please make sure the extraction backend is running and try again.'
+          : rawMessage || 'Something went wrong. Please try again.';
+
       setStatus({
         type: 'error',
-        text: error.message || 'Something went wrong. Please try again.',
+        text: friendlyMessage,
       });
       if (typeof addToast === 'function') {
-        addToast(error.message || 'Upload failed', 'error');
+        addToast(friendlyMessage, 'error');
       }
     } finally {
       setUploading(false);

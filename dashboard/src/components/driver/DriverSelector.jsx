@@ -25,13 +25,7 @@ const DriverSelector = ({ selectedDriver, onSelect }) => {
       if (!response.ok) {
         throw new Error('Unable to fetch drivers');
       }
-      const bodyText = await response.text();
-      let payload = [];
-      try {
-        payload = JSON.parse(bodyText || '[]');
-      } catch {
-        throw new Error('Unexpected response from server. Please ensure the driver API is running.');
-      }
+      const payload = await response.json();
       const list = Array.isArray(payload) ? payload : [];
       setDrivers(list);
 
@@ -54,9 +48,14 @@ const DriverSelector = ({ selectedDriver, onSelect }) => {
         });
       }
     } catch (error) {
+      const raw = error?.message || '';
+      const friendly =
+        raw.includes('Unexpected token') || raw.toLowerCase().includes('json')
+          ? 'Could not load drivers. Please ensure the backend is running.'
+          : raw || 'Failed to load drivers';
       setStatus({
         type: 'error',
-        text: error.message || 'Failed to load drivers',
+        text: friendly,
       });
     } finally {
       setLoadingDrivers(false);
@@ -134,9 +133,14 @@ const DriverSelector = ({ selectedDriver, onSelect }) => {
         text: `Saved & selected driver: ${payload.name || payload.id}`,
       });
     } catch (error) {
+      const raw = error?.message || '';
+      const friendly =
+        raw.includes('Unexpected token') || raw.toLowerCase().includes('json')
+          ? 'Could not save driver. Please ensure the backend is running.'
+          : raw || 'Unable to save driver';
       setStatus({
         type: 'error',
-        text: error.message || 'Unable to save driver',
+        text: friendly,
       });
     } finally {
       setSavingDriver(false);
