@@ -172,3 +172,18 @@
 .animate-slide-in {
   animation: slideInUp 0.5s ease-out;
 }
+
+/* Auto-rotate images to landscape */
+img[alt*="Document"], img[alt*="document"], img[src*="/uploads/"] {
+  image-orientation: from-image;
+  object-fit: contain;
+}
+
+/* Force landscape orientation for portrait images */
+@supports (image-orientation: from-image) {
+  img[alt*="Document"], img[alt*="document"], img[src*="/uploads/"] {
+    max-width: 100%;
+    height: auto;
+  }
+}
+

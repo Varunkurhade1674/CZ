@@ -34,7 +34,8 @@ router.post('/drivers', async (req, res) => {
         res.status(201).json({ id: doc.id, name: d.name || '', phone: d.phone || doc.id });
     } catch (error) {
         console.error('Driver upsert error:', error);
-        res.status(500).json({ message: 'Failed to save driver' });
+        console.error('Request body was:', req.body);
+        res.status(500).json({ message: `Failed to save driver: ${error.message}`, error: error.toString() });
     }
 });
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, X, Calendar as CalendarIcon } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, Calendar as CalendarIcon, Check, XCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const AttendanceCalendar = ({ isOpen, onClose, addToast }) => {
@@ -79,7 +79,7 @@ const AttendanceCalendar = ({ isOpen, onClose, addToast }) => {
         return attendanceData[dateKey];
     };
 
-    const toggleAttendance = async (day) => {
+    const markAttendance = async (day, status) => {
         if (!selectedDriver) {
             addToast?.('Please select a driver first', 'error');
             return;
@@ -87,7 +87,9 @@ const AttendanceCalendar = ({ isOpen, onClose, addToast }) => {
 
         const dateKey = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
         const currentStatus = attendanceData[dateKey];
-        const newStatus = currentStatus === 'present' ? 'absent' : currentStatus === 'absent' ? null : 'present';
+
+        // If clicking the same status, clear it
+        const newStatus = currentStatus === status ? null : status;
 
         try {
             const response = await fetch(buildUrl('/api/attendance'), {
@@ -105,7 +107,8 @@ const AttendanceCalendar = ({ isOpen, onClose, addToast }) => {
                     ...prev,
                     [dateKey]: newStatus,
                 }));
-                addToast?.(`Marked as ${newStatus || 'unmarked'}`, 'success');
+                const statusText = newStatus === 'present' ? 'Present' : newStatus === 'absent' ? 'Absent' : 'Unmarked';
+                addToast?.(`Marked as ${statusText}`, 'success');
             }
         } catch (error) {
             console.error('Failed to update attendance:', error);
@@ -123,7 +126,7 @@ const AttendanceCalendar = ({ isOpen, onClose, addToast }) => {
 
         // Empty cells for days before month starts
         for (let i = 0; i < startingDayOfWeek; i++) {
-            days.push(<div key={`empty-${i}`} className="aspect-square" />);
+            days.push(<div key={`empty-${i}`} className="p-2" />);
         }
 
         // Days of the month
@@ -131,26 +134,46 @@ const AttendanceCalendar = ({ isOpen, onClose, addToast }) => {
             const status = getAttendanceStatus(day);
             const isToday = isCurrentMonth && today.getDate() === day;
 
-            let bgColor = 'bg-slate-800/50 hover:bg-slate-700/50';
-            if (status === 'present') bgColor = 'bg-emerald-500/20 border-emerald-500/50 hover:bg-emerald-500/30';
-            if (status === 'absent') bgColor = 'bg-red-500/20 border-red-500/50 hover:bg-red-500/30';
-
             days.push(
-                <motion.button
+                <div
                     key={day}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => toggleAttendance(day)}
-                    disabled={!selectedDriver || loading}
-                    className={`aspect-square rounded-lg border ${bgColor} ${isToday ? 'ring-2 ring-blue-400' : 'border-white/10'
-                        } flex items-center justify-center text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed`}
+                    className={`p-2 rounded-lg border ${isToday ? 'border-blue-400 bg-blue-500/10' : 'border-white/10 bg-slate-800/30'
+                        }`}
                 >
-                    <div className="text-center">
-                        <div className={status === 'present' ? 'text-emerald-200' : status === 'absent' ? 'text-red-200' : 'text-gray-300'}>
+                    <div className="text-center mb-2">
+                        <span className={`text-sm font-semibold ${isToday ? 'text-blue-300' : 'text-gray-300'}`}>
                             {day}
-                        </div>
+                        </span>
                     </div>
-                </motion.button>
+                    <div className="flex gap-1">
+                        <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => markAttendance(day, 'present')}
+                            disabled={!selectedDriver || loading}
+                            className={`flex-1 p-1.5 rounded flex items-center justify-center transition-all ${status === 'present'
+                                    ? 'bg-emerald-500 text-white shadow-lg'
+                                    : 'bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30'
+                                } disabled:opacity-50 disabled:cursor-not-allowed`}
+                            title="Mark Present"
+                        >
+                            <Check size={14} />
+                        </motion.button>
+                        <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => markAttendance(day, 'absent')}
+                            disabled={!selectedDriver || loading}
+                            className={`flex-1 p-1.5 rounded flex items-center justify-center transition-all ${status === 'absent'
+                                    ? 'bg-red-500 text-white shadow-lg'
+                                    : 'bg-red-500/20 text-red-300 hover:bg-red-500/30'
+                                } disabled:opacity-50 disabled:cursor-not-allowed`}
+                            title="Mark Absent"
+                        >
+                            <XCircle size={14} />
+                        </motion.button>
+                    </div>
+                </div>
             );
         }
 
@@ -181,7 +204,7 @@ const AttendanceCalendar = ({ isOpen, onClose, addToast }) => {
                     initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     exit={{ scale: 0.9, opacity: 0 }}
-                    className="w-full max-w-2xl bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl shadow-2xl border border-white/10 overflow-hidden"
+                    className="w-full max-w-4xl bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl shadow-2xl border border-white/10 overflow-hidden max-h-[90vh] flex flex-col"
                 >
                     {/* Header */}
                     <div className="bg-gradient-to-r from-emerald-600 to-cyan-600 p-5">
@@ -190,7 +213,7 @@ const AttendanceCalendar = ({ isOpen, onClose, addToast }) => {
                                 <CalendarIcon className="text-white" size={28} />
                                 <div>
                                     <h2 className="text-xl font-bold text-white">Driver Attendance</h2>
-                                    <p className="text-emerald-100 text-xs">Track monthly attendance records</p>
+                                    <p className="text-emerald-100 text-xs">Mark daily attendance with ease</p>
                                 </div>
                             </div>
                             <button
@@ -203,10 +226,10 @@ const AttendanceCalendar = ({ isOpen, onClose, addToast }) => {
                     </div>
 
                     {/* Content */}
-                    <div className="p-5 space-y-4">
+                    <div className="p-5 space-y-4 overflow-y-auto flex-1">
                         {/* Driver Selection */}
                         <div>
-                            <label className="block text-xs font-semibold text-gray-200 mb-2">
+                            <label className="block text-sm font-semibold text-gray-200 mb-2">
                                 Select Driver
                             </label>
                             <select
@@ -215,11 +238,12 @@ const AttendanceCalendar = ({ isOpen, onClose, addToast }) => {
                                     const driver = drivers.find(d => d.id === e.target.value);
                                     setSelectedDriver(driver || null);
                                 }}
-                                className="w-full glass-input py-2 px-3 rounded-lg border border-white/10 bg-white/5 focus:border-emerald-400/60 text-sm"
+                                className="w-full glass-input py-2.5 px-4 rounded-lg border border-white/10 bg-slate-900 focus:border-emerald-400/60 text-sm text-white"
+                                style={{ colorScheme: 'dark' }}
                             >
-                                <option value="">-- Select a driver --</option>
+                                <option value="" style={{ backgroundColor: '#1e293b', color: '#fff' }}>-- Select a driver --</option>
                                 {drivers.map(driver => (
-                                    <option key={driver.id} value={driver.id}>
+                                    <option key={driver.id} value={driver.id} style={{ backgroundColor: '#1e293b', color: '#fff' }}>
                                         {driver.name || 'Unnamed'} ({driver.phone || driver.id})
                                     </option>
                                 ))}
@@ -230,7 +254,7 @@ const AttendanceCalendar = ({ isOpen, onClose, addToast }) => {
                         <div className="flex items-center justify-between bg-slate-800/50 rounded-lg p-3">
                             <button
                                 onClick={() => changeMonth(-1)}
-                                className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                                className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
                             >
                                 <ChevronLeft className="text-gray-300" size={20} />
                             </button>
@@ -239,48 +263,53 @@ const AttendanceCalendar = ({ isOpen, onClose, addToast }) => {
                             </h3>
                             <button
                                 onClick={() => changeMonth(1)}
-                                className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                                className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
                             >
                                 <ChevronRight className="text-gray-300" size={20} />
                             </button>
                         </div>
 
                         {/* Legend */}
-                        <div className="flex items-center justify-center gap-4 text-xs">
-                            <div className="flex items-center gap-1.5">
-                                <div className="w-3 h-3 rounded bg-emerald-500/30 border border-emerald-500/50" />
+                        <div className="flex items-center justify-center gap-6 text-xs bg-slate-800/30 rounded-lg p-3">
+                            <div className="flex items-center gap-2">
+                                <div className="w-6 h-6 rounded bg-emerald-500 flex items-center justify-center">
+                                    <Check size={14} className="text-white" />
+                                </div>
                                 <span className="text-gray-300">Present</span>
                             </div>
-                            <div className="flex items-center gap-1.5">
-                                <div className="w-3 h-3 rounded bg-red-500/30 border border-red-500/50" />
+                            <div className="flex items-center gap-2">
+                                <div className="w-6 h-6 rounded bg-red-500 flex items-center justify-center">
+                                    <XCircle size={14} className="text-white" />
+                                </div>
                                 <span className="text-gray-300">Absent</span>
                             </div>
-                            <div className="flex items-center gap-1.5">
-                                <div className="w-3 h-3 rounded bg-slate-800/50 border border-white/10" />
+                            <div className="flex items-center gap-2">
+                                <div className="w-6 h-6 rounded bg-slate-700 border border-white/20" />
                                 <span className="text-gray-300">Not Marked</span>
                             </div>
                         </div>
 
                         {/* Calendar Grid */}
-                        <div className="bg-slate-800/30 rounded-lg p-3">
-                            {/* Week day headers */}
-                            <div className="grid grid-cols-7 gap-1.5 mb-2">
-                                {weekDays.map(day => (
-                                    <div key={day} className="text-center text-[10px] font-semibold text-gray-400 uppercase">
-                                        {day}
-                                    </div>
-                                ))}
-                            </div>
+                        {selectedDriver ? (
+                            <div className="bg-slate-800/30 rounded-lg p-4">
+                                {/* Week day headers */}
+                                <div className="grid grid-cols-7 gap-2 mb-3">
+                                    {weekDays.map(day => (
+                                        <div key={day} className="text-center text-xs font-semibold text-gray-400 uppercase">
+                                            {day}
+                                        </div>
+                                    ))}
+                                </div>
 
-                            {/* Calendar days */}
-                            <div className="grid grid-cols-7 gap-1.5">
-                                {renderCalendar()}
+                                {/* Calendar days */}
+                                <div className="grid grid-cols-7 gap-2">
+                                    {renderCalendar()}
+                                </div>
                             </div>
-                        </div>
-
-                        {!selectedDriver && (
-                            <div className="text-center text-gray-400 text-sm py-2">
-                                Please select a driver to view and manage attendance
+                        ) : (
+                            <div className="text-center text-gray-400 py-12 bg-slate-800/30 rounded-lg">
+                                <CalendarIcon className="mx-auto mb-3 text-gray-500" size={48} />
+                                <p className="text-sm">Please select a driver to view and manage attendance</p>
                             </div>
                         )}
                     </div>

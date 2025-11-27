@@ -170,16 +170,17 @@ const DriverSelector = ({ selectedDriver, onSelect }) => {
           </label>
           <div className="flex flex-col lg:flex-row gap-3">
             <select
-              className="flex-1 glass-input py-3 px-4 rounded-xl border border-white/10 bg-white/5 focus:border-emerald-400/60"
+              className="flex-1 glass-input py-3 px-4 rounded-xl border border-white/10 bg-slate-900 text-white focus:border-emerald-400/60"
+              style={{ colorScheme: 'dark' }}
               value={selectedDriver?.id || ''}
               onChange={handleSelect}
               disabled={loadingDrivers}
             >
-              <option value="">-- Select driver --</option>
+              <option value="" style={{ backgroundColor: '#1e293b', color: '#fff' }}>-- Select driver --</option>
               {drivers
                 .sort((a, b) => (a.name || a.id).localeCompare(b.name || b.id))
                 .map((driver) => (
-                  <option key={driver.id} value={driver.id}>
+                  <option key={driver.id} value={driver.id} style={{ backgroundColor: '#1e293b', color: '#fff' }}>
                     {driver.name || 'Unnamed'} ({driver.phone || driver.id})
                   </option>
                 ))}

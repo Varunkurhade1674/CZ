@@ -43,6 +43,7 @@ const DocumentRecords = ({ addToast, onEditRecord, refreshSignal = 0 }) => {
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [error, setError] = useState('');
+  const [viewingImage, setViewingImage] = useState(null);
 
   const fetchRecords = useCallback(async () => {
     const config = TAB_CONFIG[activeTab];
@@ -86,8 +87,10 @@ const DocumentRecords = ({ addToast, onEditRecord, refreshSignal = 0 }) => {
       addToast?.('Document image not available for this record.', 'info');
       return;
     }
-    const url = buildUrl(`/uploads/${record.imagePath}`);
-    window.open(url, '_blank', 'noopener,noreferrer');
+    setViewingImage({
+      url: buildUrl(`/uploads/${record.imagePath}`),
+      name: record.extractedData?.name || 'Document'
+    });
   };
 
   const handleDelete = async (record) => {
@@ -334,11 +337,10 @@ const DocumentRecords = ({ addToast, onEditRecord, refreshSignal = 0 }) => {
               key={key}
               type="button"
               onClick={() => setActiveTab(key)}
-              className={`px-4 py-2 rounded-full text-sm font-semibold transition ${
-                activeTab === key
-                  ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg shadow-indigo-500/30'
-                  : 'bg-white/5 text-gray-300 border border-white/10 hover:border-indigo-300/50'
-              }`}
+              className={`px-4 py-2 rounded-full text-sm font-semibold transition ${activeTab === key
+                ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg shadow-indigo-500/30'
+                : 'bg-white/5 text-gray-300 border border-white/10 hover:border-indigo-300/50'
+                }`}
             >
               {tab.label}
             </button>
@@ -374,6 +376,39 @@ const DocumentRecords = ({ addToast, onEditRecord, refreshSignal = 0 }) => {
           <tbody className="bg-slate-900/40 text-white text-sm">{renderTableBody()}</tbody>
         </table>
       </div>
+
+      {/* Image Viewer Modal */}
+      {viewingImage && (
+        <div
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[9999] p-4"
+          onClick={() => setViewingImage(null)}
+        >
+          <div
+            className="relative bg-slate-900 rounded-xl shadow-2xl border border-white/10 max-w-lg w-full max-h-[60vh] overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-3 flex items-center justify-between">
+              <h3 className="text-white font-semibold text-sm">{viewingImage.name}</h3>
+              <button
+                onClick={() => setViewingImage(null)}
+                className="text-white hover:bg-white/20 rounded-full p-1.5 transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="p-4 flex items-center justify-center bg-black/50">
+              <img
+                src={viewingImage.url}
+                alt={viewingImage.name}
+                className="max-w-full max-h-[60vh] object-contain rounded-lg"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

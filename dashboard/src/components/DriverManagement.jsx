@@ -134,52 +134,6 @@ const DriverManagement = ({ addToast }) => {
               </button>
             </div>
           </div>
-
-          <div className="mt-6 pt-6 border-t border-gray-700/50">
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                <input
-                  type="text"
-                  placeholder="Search by name or vehicle number..."
-                  className="glass-input w-full pl-10"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-              <div className="relative">
-                <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                <select
-                  className="glass-input pl-10 pr-8 text-white bg-slate-900/70 border border-white/20"
-                  value={filterOption}
-                  onChange={(e) => setFilterOption(e.target.value)}
-                >
-                  <option value="all">All Drivers</option>
-                  <optgroup label="Verification">
-                    <option value="verification:verified">Verified</option>
-                    <option value="verification:pending">Pending</option>
-                    <option value="verification:rejected">Rejected</option>
-                  </optgroup>
-                  <optgroup label="Expiry">
-                    <option value="expiry:expired">Expired</option>
-                    <option value="expiry:upcoming">Expiring Soon (30 days)</option>
-                  </optgroup>
-                </select>
-              </div>
-            </div>
-            {searchTerm.trim() && (
-              <div className="mt-3 text-sm text-blue-600">
-                Showing results for <span className="font-semibold">"{searchTerm}"</span>
-                <button
-                  type="button"
-                  className="ml-3 text-xs text-blue-500 hover:text-blue-700"
-                  onClick={() => setSearchTerm('')}
-                >
-                  Clear
-                </button>
-              </div>
-            )}
-          </div>
         </motion.div>
 
         <motion.div
